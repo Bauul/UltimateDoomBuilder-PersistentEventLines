@@ -58,7 +58,8 @@ namespace CodeImp.DoomBuilder.BuilderModes
 		// Highlighted item
 		private Sector highlighted;
 		private readonly Association highlightasso;
-
+		private readonly Association selectionasso; //Bauul: New Event Lines on Select render function
+		
 		// Interface
 		new private bool editpressed;
 
@@ -103,7 +104,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 		public SectorsMode()
 		{
 			highlightasso = new Association(renderer);
-
+			selectionasso = new Association(renderer); //Oct 19th 2026 (Bauul): New Event Lines on Select render
 			textlabelsizecache = new Dictionary<string, float>();
 
 			//mxd
@@ -237,7 +238,15 @@ namespace CodeImp.DoomBuilder.BuilderModes
 
 				// Render effect and tag labels
 				renderer.RenderText(torenderlabels);
-				
+
+				// Bauul: Moving the event lines render here as it was causing a bug where it was in OnRedrawDisplay.
+				if (General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION && !selectionasso.IsEmpty)
+					selectionasso.Render();
+				if (General.Settings.GZShowEventLines != EventLinesRenderMode.NONE)
+				{
+					if (highlighted != null && !highlighted.IsDisposed) highlightasso.Render();
+				}
+
 				renderer.Finish();
 			}
 		}
@@ -752,6 +761,17 @@ namespace CodeImp.DoomBuilder.BuilderModes
 			}
 		}
 
+		// Bauul: Update Selection event lines whenever sector selection changes
+		public override void UpdateSelectionInfo()
+		{
+			base.UpdateSelectionInfo();
+			ICollection<Sector> selected = General.Map.Map.GetSelectedSectors(true);
+			if (selected.Count > 0)
+				selectionasso.Set(selected);
+			else
+				selectionasso.Clear();
+		}
+
 		/// <summary>
 		/// Update the labels to render with the new scale before actually doing the rendering because zooming
 		/// will redraw the display, and the labels to render must be updated by then
@@ -958,7 +978,12 @@ namespace CodeImp.DoomBuilder.BuilderModes
 				if((highlighted != null) && !highlighted.IsDisposed)
 				{
 					renderer.PlotSector(highlighted, General.Colors.Highlight);
-					highlightasso.Plot();
+					if (General.Settings.GZShowEventLines != EventLinesRenderMode.NONE)
+						highlightasso.Plot();
+				}
+				if (General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION) // Bauul: Added Event Line Selection mode
+				{
+					selectionasso.Plot();
 				}
 				renderer.Finish();
 			}
@@ -977,12 +1002,10 @@ namespace CodeImp.DoomBuilder.BuilderModes
 			// Render selection
 			if(renderer.StartOverlay(false)) 
 			{
-				if (highlighted != null && !highlighted.IsDisposed) highlightasso.Render();
 				if (selecting) RenderMultiSelection();
-
 				renderer.Finish();
 			}
-			
+
 			renderer.Present();
 		}
 
@@ -1039,7 +1062,9 @@ namespace CodeImp.DoomBuilder.BuilderModes
 					UpdateOverlaySurfaces(); //mxd
 					UpdateOverlay();
 					renderer.Present();
-
+					UpdateSelectionInfo();
+					if (General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION)
+						General.Interface.RedrawDisplay(); //Bauul: Redraw when a sector is selected in Selection Event Lines
 					//mxd. Thing selection state may've changed
 					if(General.Interface.AltState ^ BuilderPlug.Me.SyncronizeThingEdit) General.Interface.RedrawDisplay();
 				}
@@ -2615,6 +2640,9 @@ namespace CodeImp.DoomBuilder.BuilderModes
 
 			//mxd. Clear selection info
 			General.Interface.DisplayStatus(StatusType.Selection, string.Empty); 
+
+			// Bauul: Clear visible event lines on ClearSelection (credit to Boris)
+			selectionasso.Clear();
 
 			// Clear labels
 			foreach(TextLabel[] labelarray in labels.Values)

@@ -1,7 +1,8 @@
-using System;
-using System.Windows.Forms;
 using CodeImp.DoomBuilder.Controls;
+using CodeImp.DoomBuilder.Rendering;
+using System;
 using System.Reflection;
+using System.Windows.Forms;
 
 namespace CodeImp.DoomBuilder.Windows
 {
@@ -306,6 +307,9 @@ namespace CodeImp.DoomBuilder.Windows
 			this.panelinfo.SuspendLayout();
 			this.flowLayoutPanel.SuspendLayout();
 			this.SuspendLayout();
+			this.itemeventlinesnone = new System.Windows.Forms.ToolStripMenuItem(); //Oct 19th 2026 (Bauul): Event Lines render options
+			this.itemeventlineshighlight = new System.Windows.Forms.ToolStripMenuItem(); //Oct 19th 2026 (Bauul): Event Lines render options
+			this.itemeventlinesselection = new System.Windows.Forms.ToolStripMenuItem(); //Oct 19th 2026 (Bauul): Event Lines render options
 			// 
 			// toolStripSeparator1
 			// 
@@ -1813,15 +1817,44 @@ namespace CodeImp.DoomBuilder.Windows
 			this.itemtoggleclassicrendering.Text = "Classic rendering (Visual mode)";
 			this.itemtoggleclassicrendering.Click += new System.EventHandler(this.InvokeTaggedAction);
 			// 
-			// itemeventlines
+			// itemtoggleeventlines
 			// 
-			this.itemtoggleeventlines.CheckOnClick = true;
+			this.itemtoggleeventlines.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			this.itemeventlinesnone,
+			this.itemeventlineshighlight,
+			this.itemeventlinesselection});
 			this.itemtoggleeventlines.Image = global::CodeImp.DoomBuilder.Properties.Resources.InfoLine;
 			this.itemtoggleeventlines.Name = "itemtoggleeventlines";
 			this.itemtoggleeventlines.Size = new System.Drawing.Size(273, 22);
-			this.itemtoggleeventlines.Tag = "builder_gztoggleeventlines";
-			this.itemtoggleeventlines.Text = "Show Event Lines";
-			this.itemtoggleeventlines.Click += new System.EventHandler(this.InvokeTaggedAction);
+			this.itemtoggleeventlines.Text = "Event lines mode";
+			// 
+			// itemeventlinesnone
+			// 
+			this.itemeventlinesnone.CheckOnClick = true;
+			this.itemeventlinesnone.Name = "itemeventlinesnone";
+			this.itemeventlinesnone.Size = new System.Drawing.Size(180, 22);
+			this.itemeventlinesnone.Tag = 0;
+			this.itemeventlinesnone.Text = "Off";
+			this.itemeventlinesnone.Click += new System.EventHandler(this.ChangeEventLinesMode);
+			// 
+			// itemeventlineshighlight
+			// 
+			this.itemeventlineshighlight.CheckOnClick = true;
+			this.itemeventlineshighlight.Name = "itemeventlineshighlight";
+			this.itemeventlineshighlight.Size = new System.Drawing.Size(180, 22);
+			this.itemeventlineshighlight.Tag = 1;
+			this.itemeventlineshighlight.Text = "Show on Highlight";
+			this.itemeventlineshighlight.Click += new System.EventHandler(this.ChangeEventLinesMode);
+			// 
+			// itemeventlinesselection
+			// 
+			this.itemeventlinesselection.CheckOnClick = true;
+			this.itemeventlinesselection.Name = "itemeventlinesselection";
+			this.itemeventlinesselection.Size = new System.Drawing.Size(180, 22);
+			this.itemeventlinesselection.Tag = 2;
+			this.itemeventlinesselection.Text = "Show on Selection";
+			this.itemeventlinesselection.Click += new System.EventHandler(this.ChangeEventLinesMode);
+
 			// 
 			// itemvisualverts
 			// 
@@ -3150,5 +3183,8 @@ namespace CodeImp.DoomBuilder.Windows
 		private ToolStripMenuItem itemtogglecomments;
 		private ToolStripMenuItem itemtogglefixedthingsscale;
 		private ToolStripMenuItem itemtogglealwaysshowvertices;
+		private System.Windows.Forms.ToolStripMenuItem itemeventlinesnone; //Oct 19th 2026 (Bauul): Sub-items for event lines render modes
+		private System.Windows.Forms.ToolStripMenuItem itemeventlineshighlight; //Oct 19th 2026 (Bauul): Sub-items for event lines render modes
+		private System.Windows.Forms.ToolStripMenuItem itemeventlinesselection; //Oct 19th 2026 (Bauul): Sub-items for event lines render modes
 	}
 }

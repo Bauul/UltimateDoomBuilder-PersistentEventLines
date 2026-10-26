@@ -18,3 +18,4 @@ bin
 /Source/Core/*.user
 /Source/Native/*.log
 /Build/builder
+.vs/

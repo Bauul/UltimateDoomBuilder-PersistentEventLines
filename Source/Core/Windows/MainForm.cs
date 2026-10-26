@@ -2375,7 +2375,7 @@ namespace CodeImp.DoomBuilder.Windows
 				buttontogglefog.Checked = General.Settings.GZDrawFog;
 				buttontogglesky.Checked = General.Settings.GZDrawSky;
 				buttontoggleclassicrendering.Checked = General.Settings.ClassicRendering;
-				buttontoggleeventlines.Checked = General.Settings.GZShowEventLines;
+				buttontoggleeventlines.Checked = (General.Settings.GZShowEventLines != EventLinesRenderMode.NONE); //Bauul: Updated so the tool bar button is highlighted whenever either event line mode is active
 				buttontogglevisualvertices.Visible = General.Map.UDMF;
 				buttontogglevisualvertices.Checked = General.Settings.GZShowVisualVertices;
 			} 
@@ -3237,7 +3237,10 @@ namespace CodeImp.DoomBuilder.Windows
 			itemtogglefog.Checked = General.Settings.GZDrawFog;
 			itemtogglesky.Checked = General.Settings.GZDrawSky;
 			itemtoggleclassicrendering.Checked = General.Settings.ClassicRendering;
-			itemtoggleeventlines.Checked = General.Settings.GZShowEventLines;
+			foreach (ToolStripMenuItem item in itemtoggleeventlines.DropDownItems) //Bauul: Check mark to show which Event Lines mode is currently active
+				{
+					item.Checked = ((EventLinesRenderMode)(int)item.Tag == General.Settings.GZShowEventLines);
+				}
 			itemtogglevisualverts.Visible = (General.Map != null && General.Map.UDMF);
 			itemtogglevisualverts.Checked = General.Settings.GZShowVisualVertices;
 
@@ -3334,22 +3337,41 @@ namespace CodeImp.DoomBuilder.Windows
 		}
 
 		[BeginAction("gztoggleeventlines")]
-		internal void ToggleEventLines()
+		internal void ToggleEventLines() //Bauul: Hotkey updated to cycle between the three modes for the Event Lines
 		{
-			General.Settings.GZShowEventLines = !General.Settings.GZShowEventLines;
-
-			itemtoggleeventlines.Checked = General.Settings.GZShowEventLines;
-			buttontoggleeventlines.Checked = General.Settings.GZShowEventLines;
-
-			string shorttext = "Event lines are now " + (General.Settings.GZShowEventLines ? "ENABLED" : "DISABLED") + ".";
+			// The cycle goes: None --> Highlight --> Selection --> None etc.
+			switch (General.Settings.GZShowEventLines)
+			{
+				case EventLinesRenderMode.NONE:
+					General.Settings.GZShowEventLines = EventLinesRenderMode.HIGHLIGHT;
+					break;
+				case EventLinesRenderMode.HIGHLIGHT:
+					General.Settings.GZShowEventLines = EventLinesRenderMode.SELECTION;
+					break;
+				case EventLinesRenderMode.SELECTION:
+					General.Settings.GZShowEventLines = EventLinesRenderMode.NONE;
+					break;
+			}
+			string shorttext;
+			switch (General.Settings.GZShowEventLines) //Bauul: I think these messages explain things okay!
+			{
+				case EventLinesRenderMode.HIGHLIGHT:
+					shorttext = "Event lines show on HIGHLIGHT";
+					break;
+				case EventLinesRenderMode.SELECTION:
+					shorttext = "Event lines show on SELECTION";
+					break;
+				default:
+					shorttext = "Event lines DISABLED";
+					break;
+			}
 			string text = shorttext;
 			string key = Actions.Action.GetShortcutKeyDesc(General.Actions.Current.ShortcutKey);
-
 			if (!string.IsNullOrEmpty(key))
-				text += $" Press '{key}' to toggle.";
-
+				text += $" Press '{key}' to cycle mode"; //Bauul: Tweaked as its a cycle rather than a toggle now
 			General.ToastManager.ShowToast("gztoggleeventlines", ToastType.INFO, "Changed event line visibility", text, shorttext);
 
+			General.MainWindow.UpdateViewMenu(); //Bauul: Needed to get the view menu to update the tick mark properly
 			General.MainWindow.RedrawDisplay();
 			General.MainWindow.UpdateGZDoomPanel();
 		}
@@ -3888,6 +3910,15 @@ namespace CodeImp.DoomBuilder.Windows
 			RedrawDisplay();
 		}
 
+		//Bauul: New handler for the View menu to update the Event Lines variable
+		private void ChangeEventLinesMode(object sender, EventArgs e)
+		{
+			ToolStripMenuItem item = (ToolStripMenuItem)sender;
+			General.Settings.GZShowEventLines = (EventLinesRenderMode)(int)item.Tag;
+			UpdateViewMenu();
+			UpdateGZDoomPanel();
+			RedrawDisplay();
+		}
 
 		#endregion
 

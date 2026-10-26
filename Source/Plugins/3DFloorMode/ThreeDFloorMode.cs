@@ -62,6 +62,7 @@ namespace CodeImp.DoomBuilder.ThreeDFloorMode
 		protected Sector highlighted;
 		protected ThreeDFloor highlighted3dfloor;
 		private Association highlightasso;
+		private Association selectionasso; //Bauul: Event Lines Selection mode
 		private FlatVertex[] overlayGeometry;
 		private FlatVertex[] overlaygeometry3dfloors;
 		private FlatVertex[] overlaygeometry3dfloors_highlighted;
@@ -103,7 +104,7 @@ namespace CodeImp.DoomBuilder.ThreeDFloorMode
 		{
 			threedfloors = BuilderPlug.GetThreeDFloors(General.Map.Map.Sectors.ToList());
 			highlightasso = new Association(renderer);
-
+			selectionasso = new Association(renderer); //Bauul: EventLines Selection mode
 			withdrawduplicateundo = false;
 
 			// If we're coming from EditSelectionMode, and that modes was cancelled check if the last undo was to create
@@ -241,6 +242,14 @@ namespace CodeImp.DoomBuilder.ThreeDFloorMode
 					Render3DFloorLabels(selected3Dfloorlabels);
 
 				BuilderPlug.Me.ControlSectorArea.Draw(renderer, csahighlight);
+
+				// Bauul: Also moving the Event Render lines here, to avoid the same drawing bug as in Sectors mode
+				if (General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION && !selectionasso.IsEmpty)
+					selectionasso.Render();
+				if (General.Settings.GZShowEventLines != EventLinesRenderMode.NONE)
+				{
+					if ((highlighted != null) && !highlighted.IsDisposed) highlightasso.Render();
+				}
 
 				renderer.Finish();
 			}
@@ -580,6 +589,7 @@ namespace CodeImp.DoomBuilder.ThreeDFloorMode
 
 					// Update all other labels
 					UpdateLabels();
+					UpdateSelectionAssociations();
 				}
 
 				if(update)
@@ -596,6 +606,16 @@ namespace CodeImp.DoomBuilder.ThreeDFloorMode
 
 			if (BuilderModes.BuilderPlug.Me.ViewSelectionNumbers)
 				UpdateSelectedLabels();
+		}
+
+		//Bauul: Event Lines Selection helper
+		private void UpdateSelectionAssociations()
+		{
+			ICollection<Sector> selected = General.Map.Map.GetSelectedSectors(true);
+			if (selected.Count > 0)
+				selectionasso.Set(selected);
+			else
+				selectionasso.Clear();
 		}
 
 		// This updates labels from the selected sectors
@@ -760,6 +780,7 @@ namespace CodeImp.DoomBuilder.ThreeDFloorMode
 			
 			// Update
 			UpdateLabels();
+			UpdateSelectionAssociations();
 			updateOverlaySurfaces();
 			UpdateOverlay();
 
@@ -830,6 +851,12 @@ namespace CodeImp.DoomBuilder.ThreeDFloorMode
 				{
 					renderer.PlotSector(highlighted, General.Colors.Highlight);
 					// BuilderPlug.Me.PlotReverseAssociations(renderer, highlightasso);
+					if (General.Settings.GZShowEventLines != EventLinesRenderMode.NONE)
+						highlightasso.Plot();
+				}
+				if (General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION) //Bauul: Updated to include Event Lines selection mode
+				{
+					selectionasso.Plot();
 				}
 
 				renderer.Finish();
@@ -843,19 +870,19 @@ namespace CodeImp.DoomBuilder.ThreeDFloorMode
 				renderer.Finish();
 			}
 
+			// Render overlay
+			UpdateOverlay();
+
 			// Render selection
-			if(renderer.StartOverlay(true))
+			if(renderer.StartOverlay(false))
 			{
 
-				// if((highlighted != null) && !highlighted.IsDisposed) BuilderPlug.Me.RenderReverseAssociations(renderer, highlightasso);
 				if(selecting) RenderMultiSelection();
 
 				renderer.Finish();
 			}
 
-			// Render overlay
-			UpdateOverlay();
-			
+
 			renderer.Present();
 		}
 
@@ -908,6 +935,8 @@ namespace CodeImp.DoomBuilder.ThreeDFloorMode
 
 					// Thing selection state may've changed
 					if (General.Interface.AltState ^ BuilderModes.BuilderPlug.Me.SyncronizeThingEdit) General.Interface.RedrawDisplay();
+					if (General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION) //Bauul: Redraw when sectors selected or deselected in Events Line Selection mode
+						General.Interface.RedrawDisplay();
 				}
 			}
 
@@ -991,6 +1020,7 @@ namespace CodeImp.DoomBuilder.ThreeDFloorMode
 
 							SetupLabels();
 							UpdateLabels();
+							UpdateSelectionAssociations(); //Bauul: Also clear Event Lines when sector is auto-deselected
 
 							// Update entire display
 							updateOverlaySurfaces();
@@ -1398,6 +1428,9 @@ namespace CodeImp.DoomBuilder.ThreeDFloorMode
 		{
 			// Clear selection
 			General.Map.Map.ClearAllSelected();
+
+			// Bauul: Clear visible event lines on ClearSelection (thanks Boris!)
+			selectionasso.Clear();
 
 			// Clear labels
 			foreach (TextLabel[] labelarray in labels.Values)
