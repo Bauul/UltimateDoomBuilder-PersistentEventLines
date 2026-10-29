@@ -520,7 +520,7 @@ namespace CodeImp.DoomBuilder.Rendering
 				RenderSlopeHandles();
 
 			//mxd. Event lines
-			if (General.Settings.GZShowEventLines != EventLinesRenderMode.NONE) RenderArrows(eventlines); //Bauul: Updating this so Event Lines render in 3D mode for either Highlight or Selection modes
+			if (General.Settings.GZShowEventLines != EventLinesRenderMode.NONE) RenderArrows(eventlines); //Updating this so Event Lines render in 3D mode for either Highlight or Selection modes
 
 			// Remove references
 			graphics.SetTexture(null);

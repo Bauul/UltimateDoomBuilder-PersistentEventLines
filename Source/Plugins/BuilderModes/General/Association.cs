@@ -44,8 +44,8 @@ namespace CodeImp.DoomBuilder.BuilderModes
 		private Font font;
 		private Dictionary<string, Vector2D> textwidths;
 		private Dictionary<string, List<TextLabel>> textlabels;
-		private int eventlinecount; //Bauul: Holds the current number of rendered event lines
-		private bool limitlines; //Bauul: Bool to let the original Highlight function skip the render limit
+		private int eventlinecount; //Holds the current number of rendered event lines
+		private bool limitlines; //Bool to let the original Highlight function skip the render limit
 
 		// Map elements that are associated
 		private List<Thing> things;
@@ -59,7 +59,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 		public List<Thing> Things { get { return things; } }
 		public List<Sector> Sectors { get { return sectors; } }
 		public List<Linedef> Linedefs { get { return linedefs; } }
-		public bool IsEmpty { get { return things.Count == 0 && sectors.Count == 0 && linedefs.Count == 0 && eventlines.Count == 0; } } //Bauul: Updated to consider event lines
+		public bool IsEmpty { get { return things.Count == 0 && sectors.Count == 0 && linedefs.Count == 0 && eventlines.Count == 0; } } //Updated to consider event lines
 
 		//mxd. This sets up the association
 		public Association(IRenderer2D renderer)
@@ -112,7 +112,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 		}
 
 		/// <summary>
-		/// Bauul: Updated version to maintain the original Highlight functionality
+		/// Updated version to maintain the original Highlight functionality
 		/// Sets the association for a single map element (Thing, Sector, or Linedef)
 		/// </summary>
 		/// <param name="element">An instance of Thing, Sector, or Linedef</param>
@@ -123,10 +123,10 @@ namespace CodeImp.DoomBuilder.BuilderModes
 				Clear();
 				return;
 			}
-			Set(new[] { element }, false); //Bauul: ensure highlight isn't limited by event line limit
+			Set(new[] { element }, false); //ensure highlight isn't limited by event line limit
 		}
 		/// <summary>
-		/// Bauul: New inclusion for event lines on Selection
+		/// New inclusion for event lines on Selection
 		/// Sets the association for multiple map elements (e.g. selected linedefs, sectors, or things)
 		/// </summary>
 		public void Set(IEnumerable<SelectableElement> elements, bool limit = true)
@@ -140,7 +140,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 			{
 				if (element == null || element.IsDisposed)
 					continue;
-				// Bauul: Stop processing more elements once the maximum event lines are reached
+				// Stop processing more elements once the maximum event lines are reached
 				if (limitlines && eventlinecount >= BuilderPlug.Me.MaxEventLines)
 					break;
 				// Fast pre-filter: skip inert elements that have no actions or tags
@@ -158,7 +158,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 		}
 		/// <summary>
 		/// Gathers forward and reverse associations for a single element and adds them to the existing lists
-		/// Bauul: Breaking these out for the Event Lines Selection mode
+		/// Breaking these out for the Event Lines Selection mode
 		/// </summary>
 		private void AddAssociationsForElement(SelectableElement element)
 		{
@@ -246,7 +246,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 			eventlines = new Dictionary<string, List<Line3D>>();
 			textlabels = new Dictionary<string, List<TextLabel>>();
 			textwidths = new Dictionary<string, Vector2D>();
-			eventlinecount = 0; //Bauul: Clears out the selected event line count
+			eventlinecount = 0; //Clears out the selected event line count
 			limitlines = false;
 		}
 
@@ -821,7 +821,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 			if (action == null)
 				return;
 
-			// Bauul: Cap the number of event lines rendered in Selection mode
+			// Cap the number of event lines rendered in Selection mode
 			if (limitlines && eventlinecount >= BuilderPlug.Me.MaxEventLines)
 				return;
 			if (!eventlines.ContainsKey(action))
@@ -832,7 +832,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 		}
 
 		/// <summary>
-		/// Bauul: Check to skip elements that can't have any associations 
+		/// Check to skip elements that can't have any associations 
 		/// </summary>
 		private static bool ElementCanHaveAssociations(SelectableElement element)
 		{
@@ -863,7 +863,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 		}
 
 		/// <summary>
-		/// Oct 21st 2026 (Bauul): Checks if the given map element has UDMF fields with associations, and skips rendering any event lines if so
+		/// Checks if the given map element has UDMF fields with associations, and skips rendering any event lines if so
 		/// </summary>
 		private static bool ElementHasUDMFFieldAssociations(SelectableElement element)
 		{
@@ -1102,7 +1102,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 				renderer.RenderGeometry(verts, null, true);
 			}
 
-			if (General.Settings.GZShowEventLines != EventLinesRenderMode.NONE) //Bauul: changed to kick in for either event line render modes (i.e. not "off")
+			if (General.Settings.GZShowEventLines != EventLinesRenderMode.NONE) //changed to kick in for either event line render modes (i.e. not "off")
 			{
 				List<Line3D> lines = new List<Line3D>(eventlines.Count);
 				List<ITextLabel> labels = new List<ITextLabel>(eventlines.Count);

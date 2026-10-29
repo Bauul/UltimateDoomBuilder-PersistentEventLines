@@ -55,7 +55,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 		// Highlighted item
 		private Linedef highlighted;
 		private readonly Association highlightasso;
-		private readonly Association selectionasso; //Bauul: Added new Event Lines on Select view
+		private readonly Association selectionasso; //Added new Event Lines on Select view
 		private Vector2D insertpreview = new Vector2D(float.NaN, float.NaN); //mxd
 
 		//mxd. Text labels
@@ -94,7 +94,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 		{
 			//mxd. Associations now requre initializing...
 			highlightasso = new Association(renderer);
-			selectionasso = new Association(renderer); //Oct 19th 2026 (Bauul): New Event Lines on Select render
+			selectionasso = new Association(renderer); //New Event Lines on Select render
 			textlabelsizecache = new Dictionary<string, float>();
 		}
 
@@ -454,7 +454,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 			ICollection<Linedef> orderedselection = General.Map.Map.GetSelectedLinedefs(true);
 			labels = new Dictionary<Linedef, SelectionLabel>(orderedselection.Count);
 
-			// Bauul: Update Event Lines selection associations
+			// Update Event Lines selection associations
 			if (orderedselection.Count > 0)
 				selectionasso.Set(orderedselection);
 			else
@@ -495,7 +495,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 			{
 				if (!selecting) //mxd
 				{
-					// Bauul: Render event lines for selected elements
+					// Render event lines for selected elements
 					if (General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION && !selectionasso.IsEmpty)
 						selectionasso.Render();
 
@@ -710,7 +710,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 			{
 				renderer.PlotLinedefSet(General.Map.Map.Linedefs);
 
-				if (General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION) // Bauul: Selection Event Lines mode element color highlight
+				if (General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION) // Selection Event Lines mode element color highlight
 				{
 					selectionasso.Plot();
 				}
@@ -773,7 +773,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 					highlighted.Selected = !highlighted.Selected;
 					UpdateSelectionInfo(); //mxd
 
-					//mxd. Full redraw when labels were changed (or when event lines are shown on selecton - Bauul)
+					//mxd. Full redraw when labels were changed (or when event lines are shown on selecton)
 					if(BuilderPlug.Me.ViewSelectionNumbers || General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION)
 					{
 						General.Interface.RedrawDisplay();
@@ -1465,7 +1465,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 			//mxd. Clear selection info
 			General.Interface.DisplayStatus(StatusType.Selection, string.Empty);
 
-			// Bauul: Clear visible event lines on ClearSelection (thanks for the tip Boris!)
+			// Clear visible event lines on ClearSelection (thanks for the tip Boris!)
 			selectionasso.Clear();
 
 			//mxd. Clear selection labels

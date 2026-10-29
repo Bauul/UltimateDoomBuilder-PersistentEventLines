@@ -58,7 +58,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 		// Highlighted item
 		private Sector highlighted;
 		private readonly Association highlightasso;
-		private readonly Association selectionasso; //Bauul: New Event Lines on Select render function
+		private readonly Association selectionasso; //New Event Lines on Select render function
 		
 		// Interface
 		new private bool editpressed;
@@ -104,7 +104,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 		public SectorsMode()
 		{
 			highlightasso = new Association(renderer);
-			selectionasso = new Association(renderer); //Oct 19th 2026 (Bauul): New Event Lines on Select render
+			selectionasso = new Association(renderer); //New Event Lines on Select render
 			textlabelsizecache = new Dictionary<string, float>();
 
 			//mxd
@@ -239,7 +239,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 				// Render effect and tag labels
 				renderer.RenderText(torenderlabels);
 
-				// Bauul: Moving the event lines render here as it was causing a bug where it was in OnRedrawDisplay.
+				//Moving the event lines render here as it was causing a bug where it was in OnRedrawDisplay.
 				if (General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION && !selectionasso.IsEmpty)
 					selectionasso.Render();
 				if (General.Settings.GZShowEventLines != EventLinesRenderMode.NONE)
@@ -761,7 +761,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 			}
 		}
 
-		// Bauul: Update Selection event lines whenever sector selection changes
+		//Update Selection event lines whenever sector selection changes
 		public override void UpdateSelectionInfo()
 		{
 			base.UpdateSelectionInfo();
@@ -981,7 +981,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 					if (General.Settings.GZShowEventLines != EventLinesRenderMode.NONE)
 						highlightasso.Plot();
 				}
-				if (General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION) // Bauul: Added Event Line Selection mode
+				if (General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION) //Added Event Line Selection mode
 				{
 					selectionasso.Plot();
 				}
@@ -1063,10 +1063,8 @@ namespace CodeImp.DoomBuilder.BuilderModes
 					UpdateOverlay();
 					renderer.Present();
 					UpdateSelectionInfo();
-					if (General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION)
-						General.Interface.RedrawDisplay(); //Bauul: Redraw when a sector is selected in Selection Event Lines
 					//mxd. Thing selection state may've changed
-					if(General.Interface.AltState ^ BuilderPlug.Me.SyncronizeThingEdit) General.Interface.RedrawDisplay();
+					if((General.Interface.AltState ^ BuilderPlug.Me.SyncronizeThingEdit) || (General.Settings.GZShowEventLines == EventLinesRenderMode.SELECTION)) General.Interface.RedrawDisplay();
 				}
 				else if(BuilderPlug.Me.AutoClearSelection) //mxd
 				{
@@ -2641,7 +2639,7 @@ namespace CodeImp.DoomBuilder.BuilderModes
 			//mxd. Clear selection info
 			General.Interface.DisplayStatus(StatusType.Selection, string.Empty); 
 
-			// Bauul: Clear visible event lines on ClearSelection (credit to Boris)
+			//Clear visible event lines on ClearSelection (credit to Boris)
 			selectionasso.Clear();
 
 			// Clear labels

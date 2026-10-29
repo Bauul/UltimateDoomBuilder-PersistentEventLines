@@ -1,4 +1,4 @@
-using CodeImp.DoomBuilder.Controls;
+﻿using CodeImp.DoomBuilder.Controls;
 using CodeImp.DoomBuilder.Rendering;
 using System;
 using System.Reflection;
