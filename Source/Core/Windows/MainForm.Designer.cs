@@ -3183,8 +3183,8 @@ namespace CodeImp.DoomBuilder.Windows
 		private ToolStripMenuItem itemtogglecomments;
 		private ToolStripMenuItem itemtogglefixedthingsscale;
 		private ToolStripMenuItem itemtogglealwaysshowvertices;
-		private System.Windows.Forms.ToolStripMenuItem itemeventlinesnone; //Oct 19th 2026 (Bauul): Sub-items for event lines render modes
-		private System.Windows.Forms.ToolStripMenuItem itemeventlineshighlight; //Oct 19th 2026 (Bauul): Sub-items for event lines render modes
-		private System.Windows.Forms.ToolStripMenuItem itemeventlinesselection; //Oct 19th 2026 (Bauul): Sub-items for event lines render modes
+		private System.Windows.Forms.ToolStripMenuItem itemeventlinesnone; 
+		private System.Windows.Forms.ToolStripMenuItem itemeventlineshighlight; 
+		private System.Windows.Forms.ToolStripMenuItem itemeventlinesselection; 
 	}
 }
